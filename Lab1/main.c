@@ -11,14 +11,14 @@
 #include <time.h>
 
 void printMessage(char const *e) {
-    printf(e);
+    printf("%s", e);
     _getch();
 }
 
 void clearInputBuffer() {
-    //fflush(stdin);
-    char c;
-    while ((c = getc(stdin)) != '\n' && c != EOF);
+    fflush(stdin);
+    //char c;
+    //while ((c=getc(stdin)) != EOF && c != '\n');
 }
 
 #pragma region n1
@@ -76,7 +76,7 @@ int createFile(char const *path) {
 #pragma region n2
 struct user {
     char login[BUFSIZ];
-    int pin;
+    int pin, isSanctioned;
 } typedef user;
 
 int findUser(
@@ -84,7 +84,7 @@ int findUser(
     int pin,
     user const *registredUsers,
     int userCount) {
-    if(userCount == -1)
+    if(userCount == -1 || registredUsers == NULL)
         return -1;
     int i;
     for(i = 0; i < userCount; ++i) {
@@ -94,6 +94,17 @@ int findUser(
             ) {
             return i;
         }
+    }
+    return -1;
+}
+
+int findUserByLogin(char const *login, user const *registredUsers, int userCount) {
+    if(userCount == -1 || registredUsers == NULL)
+        return -1;
+    int i = 0;
+    for(i = 0; i < userCount; ++i) {
+        if(!strcmp(registredUsers[i].login, login))
+            return i;
     }
     return -1;
 }
@@ -151,7 +162,7 @@ time_t strToTime(char const *str) {
     return mktime(&tm);
 }
 
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
     unsigned char command = 0;
     char currentLogin[7], userCommand[BUFSIZ], separatedUserCommand[3][BUFSIZ], timeBuffer[BUFSIZ];
     user *registredUsers = NULL;
@@ -161,8 +172,19 @@ int main(int argc, char** argv) {
     while(1) {
         if(currentUser != -1) {
             // Handle user commands
-            printf("Enter command:\nTime \nDate \nHowmuch <datetime> <flag> \nSanctions <username> \nLogout \n");
             clearInputBuffer();
+            if(registredUsers != NULL && registredUsers[currentUser].isSanctioned) {
+                printMessage("You was sanctioned!\n");
+                printf("Enter command:\nLogout\n");
+                gets(userCommand);
+                if(strcmp(userCommand, "Logout"))
+                    printMessage("Unknown command");
+                else
+                    currentUser = -1;
+                system("cls");
+                continue;
+            }
+            printf("Enter command:\nTime \nDate \nHowmuch <datetime> <flag> \nSanctions <username> \nLogout \n");
             gets(userCommand);
             for(i = 0; i < 3; ++i)
                 separatedUserCommand[i][0] = '\0';
@@ -198,6 +220,18 @@ int main(int argc, char** argv) {
                     _getch();
                 }
             } else if(!strcmp(separatedUserCommand[0], "Sanctions")) {
+                int targetUserId = findUserByLogin(separatedUserCommand[1], registredUsers, userCount);
+                if(targetUserId == -1) {
+                    printMessage("User not found");
+                } else {
+                    if(currentUser == targetUserId)
+                        printMessage("Are you stupid?");
+                    else {
+                        registredUsers[targetUserId].isSanctioned = 1;
+                        printf("%s was Sanctioned", separatedUserCommand[1]);
+                        _getch();
+                    }
+                }
 
             } else if(!strcmp(separatedUserCommand[0], "Logout")) {
                 currentUser = -1;
@@ -231,12 +265,13 @@ int main(int argc, char** argv) {
                     if(registredUsers == NULL)
                         return 1;
                 }
-                if(findUser(currentLogin, currentPin, registredUsers, userCount) != -1) {
+                if(findUserByLogin(currentLogin, registredUsers, userCount) != -1) {
                     printMessage("User allready exist");
                     break;
                 }
                 strcpy(registredUsers[userCount++].login, currentLogin);
                 registredUsers[userCount - 1].pin = currentPin;
+                registredUsers[userCount - 1].isSanctioned = 0;
                 if(userCount == pSize) {
                     user *ptr = registredUsers;
                     registredUsers = (user *)realloc(registredUsers, pSize *= 2);
@@ -257,6 +292,9 @@ int main(int argc, char** argv) {
     if(registredUsers != NULL)
         free(registredUsers);
     return 0;
-}
+}*/
 #pragma endregion
 
+#pragma region n3
+
+#pragma endregion
