@@ -2,17 +2,16 @@
 // Created by dimab on 09.09.2025.
 //
 
-#include <stdlib.h>
+#include "stdlib.h"
 
 #include "stdio.h"
-#include <conio.h>
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
+#include "ctype.h"
+#include "string.h"
+#include "time.h"
 
 void printMessage(char const *e) {
     printf("%s", e);
-    _getch();
+    getc(stdin);
 }
 
 void clearInputBuffer() {
@@ -162,7 +161,7 @@ time_t strToTime(char const *str) {
     return mktime(&tm);
 }
 
-/*int main(int argc, char** argv) {
+int main(int argc, char** argv) {
     unsigned char command = 0;
     char currentLogin[7], userCommand[BUFSIZ], separatedUserCommand[3][BUFSIZ], timeBuffer[BUFSIZ];
     user *registredUsers = NULL;
@@ -217,7 +216,7 @@ time_t strToTime(char const *str) {
                     else if(!strcmp(separatedUserCommand[2], "-m"))
                         timediff /= 60.0;
                     printf("Time difference: %f\n", timediff);
-                    _getch();
+                    getc(stdin);
                 }
             } else if(!strcmp(separatedUserCommand[0], "Sanctions")) {
                 int targetUserId = findUserByLogin(separatedUserCommand[1], registredUsers, userCount);
@@ -229,7 +228,7 @@ time_t strToTime(char const *str) {
                     else {
                         registredUsers[targetUserId].isSanctioned = 1;
                         printf("%s was Sanctioned", separatedUserCommand[1]);
-                        _getch();
+                        getc(stdin);
                     }
                 }
 
@@ -292,9 +291,25 @@ time_t strToTime(char const *str) {
     if(registredUsers != NULL)
         free(registredUsers);
     return 0;
-}*/
+}
 #pragma endregion
 
 #pragma region n3
-
+/*int main(int argc, char **argv) {
+    if(argc != 3) {
+        printMessage("Arg error");
+        return -1;
+    }
+    FILE *sourceFile = fopen(argv[1], "rb"), *destFile = fopen(argv[2], "wb");
+    if(sourceFile == NULL || destFile == NULL) {
+        printMessage("File open error");
+    }
+    unsigned char byte = 0;
+    while(fread(&byte, sizeof(unsigned char), 1, sourceFile)) {
+        fwrite(&byte, sizeof(unsigned char), 1, destFile);
+    }
+    fclose(sourceFile);
+    fclose(destFile);
+    return 0;
+}*/
 #pragma endregion
