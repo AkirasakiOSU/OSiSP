@@ -3,9 +3,7 @@
 //
 
 #include "math.h"
-
 #include "stdlib.h"
-
 #include "stdio.h"
 #include "ctype.h"
 #include "string.h"
@@ -177,7 +175,7 @@ time_t strToTime(char const *str) {
     return mktime(&tm);
 }
 
-/*int main(int argc, char** argv) {
+int main(int argc, char** argv) {
     unsigned char command = 0;
     char currentLogin[7], userCommand[BUFSIZ], separatedUserCommand[3][BUFSIZ], timeBuffer[BUFSIZ];
     user *registredUsers = NULL;
@@ -307,7 +305,7 @@ time_t strToTime(char const *str) {
     if(registredUsers != NULL)
         free(registredUsers);
     return 0;
-}*/
+}
 #pragma endregion
 
 #pragma region n3
@@ -319,6 +317,9 @@ time_t strToTime(char const *str) {
     FILE *sourceFile = fopen(argv[1], "rb"), *destFile = fopen(argv[2], "wb");
     if(sourceFile == NULL || destFile == NULL) {
         printMessage("File open error");
+        fclose(sourceFile);
+        fclose(destFile);
+        return -2;
     }
     unsigned char byte = 0;
     while(fread(&byte, sizeof(unsigned char), 1, sourceFile)) {
@@ -355,16 +356,11 @@ void maskToInt(char const *mask, unsigned char *result) {
     for (int i = 0; i < 4; ++i) {
         result[i] = 0;
     }
-
     if (mask == NULL) return;
-
     int l = strlen(mask), length = (l > 8) ? 8 : l;
-
     int byteIndex = 3, bitShift = 0;
-
     unsigned int digit;
     char c = 0;
-
     for (int i = length - 1; i >= 0; i--) {
         c = mask[i];
         c = toupper(c);
@@ -392,50 +388,48 @@ int checkMask(unsigned char const *mask, unsigned char const *bytes) {
     return 1;
 }
 
-int main(int argc, char **argv) {
-    if(argc < 3) {
-        printMessage("Arg error");
-        return 1;
-    }
-
-    FILE *f = fopen(argv[1], "rb");
-    if(f == NULL)
-        return -1;
-    unsigned char byte = 0, fourBytes[4] = {0}, b = 0, sumBuffer[BUFSIZ];
-    size_t sum = 0, i = 0;
-    if(!strcmp(argv[2], "xor8")) {
-        while(fread(&byte, sizeof(unsigned char), 1, f)) {
-            if(!sum)
-                sum = byte;
-            else
-                sum ^= byte;
-        }
-    } else if(!strcmp(argv[2], "xorodd")) {
-        while((b = fread(&fourBytes, sizeof(unsigned char), 4, f))) {
-            for(i = 0; i < 4; ++i) {
-                if(isOdd(fourBytes[i])) {
-                    sum = (!sum ? bytesToLLInt(fourBytes) : sum ^ bytesToLLInt(fourBytes));
-                    break;
-                }
-            }
-        }
-    } else if(!strcmp(argv[2], "mask")) {
-        if(argc != 4) {
-            printMessage("Unknown command");
-            return 1;
-        }
-        unsigned char mask[4] = {0};
-        maskToInt(argv[3], mask);
-        while((b = fread(&fourBytes, sizeof(unsigned char), 4, f))) {
-            if(checkMask(mask, fourBytes))
-                ++sum;
-        }
-    } else {
-        printMessage("Unknown command");
-        return 1;
-    }
-    printf("%llu ", sum);
-    fclose(f);
-    return 0;
-}
+/*// int main(int argc, char **argv) {
+//     if(argc < 3) {
+//         printMessage("Arg error");
+//         return 1;
+//     }
+//
+//     FILE *f = fopen(argv[1], "rb");
+//     if(f == NULL)
+//         return -1;
+//     unsigned char byte = 0, fourBytes[4] = {0}, b = 0, sumBuffer[BUFSIZ];
+//     size_t sum = 0, i = 0;
+//     if(!strcmp(argv[2], "xor8")) {
+//         while(fread(&byte, sizeof(unsigned char), 1, f)) {
+//             sum ^= byte;
+//         }
+//     } else if(!strcmp(argv[2], "xorodd")) {
+//         while(fread(&fourBytes, sizeof(unsigned char), 4, f)) {
+//             for(i = 0; i < 4; ++i) {
+//                 if(isOdd(fourBytes[i])) {
+//                     sum = (!sum ? bytesToLLInt(fourBytes) : sum ^ bytesToLLInt(fourBytes));
+//                     break;
+//                 }
+//             }
+//         }
+//     } else if(!strcmp(argv[2], "mask")) {
+//         if(argc != 4) {
+//             printMessage("Unknown command");
+//             return 1;
+//         }
+//         unsigned char mask[4] = {0};
+//         maskToInt(argv[3], mask);
+//         while(fread(&fourBytes, sizeof(unsigned char), 4, f)) {
+//             if(checkMask(mask, fourBytes))
+//                 ++sum;
+                
+//         }
+//     } else {
+//         printMessage("Unknown command");
+//         return 1;
+//     }
+//     printf("%llu ", sum);
+//     fclose(f);
+//     return 0;
+// }*/
 #pragma endregion
